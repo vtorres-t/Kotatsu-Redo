@@ -1,0 +1,30 @@
+name: Discord Commit Webhook
+
+on:
+  push:
+    branches:
+      - '**'  # Trigger on all branches, adjust if needed
+
+jobs:
+  discordNotification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord with Embed
+        uses: tsickert/discord-webhook@v4
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed: |
+            {
+              "title": "New Commit: ${{ github.event.repository.name }}",
+              "description": "${{ github.event.head_commit.message }}",
+              "url": "${{ github.event.head_commit.url }}",
+              "color": 5814783,
+              "author": {
+                "name": "${{ github.actor }}",
+                "icon_url": "https://github.com/${{ github.actor }}.png"
+              },
+              "footer": {
+                "text": "Branch: ${{ github.ref_name }}"
+              },
+              "timestamp": "${{ github.event.head_commit.timestamp }}"
+            }
