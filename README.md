@@ -67,11 +67,11 @@ See [CONTRIBUTING.md](https://github.com/Kotatsu-Redo/Kotatsu-Redo/blob/devel/CO
 ### Certificate fingerprints
 
 ```plaintext
-2C:19:C7:E8:07:61:2B:8E:94:51:1B:FD:72:67:07:64:5D:C2:58:AE
+70:BD:84:07:13:01:84:5E:A3:D0:A4:E5:F3:3A:D2:41:0D:C9:FC:EB
 ```
 
 ```plaintext
-67:E1:51:00:BB:80:93:01:78:3E:DC:B6:34:8F:A3:BB:F8:30:34:D9:1E:62:86:8A:91:05:3D:BD:70:DB:3F:18
+FF:D9:C9:91:06:64:07:69:3C:F4:6E:46:9F:EA:DB:88:8D:33:FB:B2:FB:A7:7E:A3:79:B0:CA:12:A3:5C:66:1A
 ```
 
 ### License
