@@ -29,6 +29,7 @@ import org.koitharu.kotatsu.parsers.config.MangaSourceConfig
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.core.network.webview.WebViewRequestInterceptorExecutor
 import org.koitharu.kotatsu.parsers.webview.InterceptedRequest
+import org.koitharu.kotatsu.parsers.webview.InterceptionConfig as ParsersInterceptionConfig
 import org.koitharu.kotatsu.parsers.network.UserAgents
 import org.koitharu.kotatsu.parsers.util.map
 import java.util.Locale
@@ -109,6 +110,31 @@ class MangaLoaderContextImpl @Inject constructor(
         )
 
         val captured = webViewRequestInterceptorExecutor.interceptRequests(url, config)
+        return captured.map { appRequest ->
+            InterceptedRequest(
+                url = appRequest.url,
+                method = appRequest.method,
+                headers = appRequest.headers,
+                timestamp = appRequest.timestamp,
+                body = appRequest.body
+            )
+        }
+    }
+
+    // New method to support InterceptionConfig with pageScript
+    override suspend fun interceptWebViewRequests(
+        url: String,
+        config: ParsersInterceptionConfig
+    ): List<InterceptedRequest> {
+        val appConfig = org.koitharu.kotatsu.core.network.webview.InterceptionConfig(
+            timeoutMs = config.timeoutMs,
+            maxRequests = config.maxRequests,
+            urlPattern = config.urlPattern,
+            filterScript = config.filterScript,
+            pageScript = config.pageScript  // This is the key part that was missing!
+        )
+
+        val captured = webViewRequestInterceptorExecutor.interceptRequests(url, appConfig)
         return captured.map { appRequest ->
             InterceptedRequest(
                 url = appRequest.url,

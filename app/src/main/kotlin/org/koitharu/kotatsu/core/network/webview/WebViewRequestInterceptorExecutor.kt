@@ -83,8 +83,9 @@ class WebViewRequestInterceptorExecutor @Inject constructor(
                     }
                 }
 
+                var webView: WebView? = null
                 try {
-                    val webView = obtainWebView()
+                    webView = obtainWebView()
                     val client = RequestInterceptorWebViewClient(callback, adBlock, config, interceptor)
                     webView.webViewClient = client
                     webView.loadUrl(url)
@@ -97,15 +98,35 @@ class WebViewRequestInterceptorExecutor @Inject constructor(
 
                     resultDeferred.invokeOnCompletion { ex ->
                         mainHandler.removeCallbacks(timeoutRunnable)
+                        // Clean up WebView after operation completes
+                        webView?.let { wv ->
+                            Log.d(TAG_VRF, "Cleaning up WebView after operation")
+                            wv.stopLoading()
+                            wv.destroy()
+                            webViewCached = null
+                        }
                         if (ex != null) continuation.resumeWithException(ex)
                         else continuation.resume(resultDeferred.getCompleted())
                     }
                     continuation.invokeOnCancellation {
                         client.stopCapturing()
                         mainHandler.removeCallbacks(timeoutRunnable)
+                        // Clean up WebView on cancellation
+                        webView?.let { wv ->
+                            Log.d(TAG_VRF, "Cleaning up WebView on cancellation")
+                            wv.stopLoading()
+                            wv.destroy()
+                            webViewCached = null
+                        }
                         if (!resultDeferred.isCompleted) resultDeferred.cancel()
                     }
                 } catch (e: Exception) {
+                    // Clean up WebView on exception
+                    webView?.let { wv ->
+                        Log.d(TAG_VRF, "Cleaning up WebView on exception")
+                        wv.destroy()
+                        webViewCached = null
+                    }
                     continuation.resumeWithException(e)
                 }
             }
@@ -145,9 +166,20 @@ class WebViewRequestInterceptorExecutor @Inject constructor(
 
     @MainThread
     private fun obtainWebView(): WebView {
-        webViewCached?.get()?.let { return it }
-        val wv = WebView(context).apply { configureForParser(null) }
-        Log.d(TAG_VRF, "Created new WebView instance")
+        // Always create a fresh WebView for VRF extraction to avoid state issues
+        webViewCached?.get()?.let { oldWebView ->
+            Log.d(TAG_VRF, "Destroying previous WebView instance")
+            oldWebView.destroy()
+            webViewCached = null
+        }
+
+        val wv = WebView(context).apply {
+            configureForParser(null)
+            // Clear any existing state
+            clearHistory()
+            clearCache(true)
+        }
+        Log.d(TAG_VRF, "Created fresh WebView instance")
         webViewCached = WeakReference(wv)
         return wv
     }
@@ -155,40 +187,73 @@ class WebViewRequestInterceptorExecutor @Inject constructor(
 
 // If you added evaluateFilterPredicate earlier, keep it here.
 fun evaluateFilterPredicate(script: String, requestUrl: String): Boolean {
+    Log.v(TAG_VRF, "Full script: '$script'")
+
     val returnIdx = script.lastIndexOf("return")
     if (returnIdx == -1) {
         Log.v(TAG_VRF, "No return in script, capturing all. url=$requestUrl")
         return true
     }
-    val expr = script.substring(returnIdx + 6).substringBefore(";").trim()
+
+    // Extract everything after "return " until end of script, then remove semicolon if present
+    val afterReturn = script.substring(returnIdx + 6).trim()
+    val expr = if (afterReturn.endsWith(";")) {
+        afterReturn.dropLast(1).trim()
+    } else {
+        afterReturn
+    }
+
     if (expr.isEmpty()) {
         Log.v(TAG_VRF, "Empty return expression, capturing all. url=$requestUrl")
         return true
     }
+
+    Log.v(TAG_VRF, "Evaluating predicate for url=$requestUrl expr='$expr'")
+
+    // Simple check for url.includes('vrf=') - handle it directly without complex parsing
+    if (expr == "url.includes('vrf=')" || expr == """url.includes("vrf=")""") {
+        val contains = requestUrl.contains("vrf=")
+        val status = if (contains) "Predicate MATCH" else "Predicate MISS"
+        Log.d(TAG_VRF, "$status url=$requestUrl expr=$expr contains=$contains")
+        return contains
+    }
+
+    // Fallback to complex parsing for other expressions
     val orClauses = expr.split("||").map { it.trim() }
     for (clause in orClauses) {
         val andTerms = clause.trim().trim('(', ')')
             .split("&&").map { it.trim() }.filter { it.isNotEmpty() }
         var allMatch = true
+
+        Log.v(TAG_VRF, "Checking clause: '$clause' with ${andTerms.size} AND terms")
+
         for (term in andTerms) {
-            val m = Regex("""url\.includes\(\s*(['"])(.*?)\1\s*\)""").find(term)
-            if (m != null) {
-                val needle = m.groupValues[2]
+            Log.v(TAG_VRF, "Processing term: '$term'")
+
+            // Handle url.includes('...') or url.includes("...")
+            val singleQuoteMatch = Regex("""url\.includes\(\s*'([^']*)'\s*\)""").find(term)
+            val doubleQuoteMatch = Regex("""url\.includes\(\s*"([^"]*)"\s*\)""").find(term)
+
+            val match = singleQuoteMatch ?: doubleQuoteMatch
+            if (match != null) {
+                val needle = match.groupValues[1]
                 val contains = requestUrl.contains(needle)
+                Log.v(TAG_VRF, "Term: '$term' -> needle: '$needle' -> contains: $contains")
                 if (!contains) {
                     allMatch = false
                     break
                 }
             } else {
+                Log.v(TAG_VRF, "Term does not match url.includes pattern: '$term'")
                 allMatch = false
                 break
             }
         }
         if (allMatch) {
-            Log.v(TAG_VRF, "Predicate MATCH url=$requestUrl clause=$clause")
+            Log.d(TAG_VRF, "Predicate MATCH url=$requestUrl clause='$clause'")
             return true
         }
     }
-    Log.v(TAG_VRF, "Predicate MISS url=$requestUrl expr=$expr")
+    Log.d(TAG_VRF, "Predicate MISS url=$requestUrl expr='$expr'")
     return false
 }

@@ -29,6 +29,7 @@ class RequestInterceptorWebViewClient(
     private val mutex = Mutex()
     private val isCapturing = AtomicBoolean(true)
     private val startTime = System.currentTimeMillis()
+    private val scriptInjected = AtomicBoolean(false)
 
     @WorkerThread
     override fun shouldInterceptRequest(
@@ -50,9 +51,11 @@ class RequestInterceptorWebViewClient(
     override fun onPageFinished(view: WebView, url: String) {
         super.onPageFinished(view, url)
         val script = config.pageScript
-        if (!script.isNullOrBlank()) {
-            Log.d(TAG_VRF, "Injecting pageScript...")
+        if (!script.isNullOrBlank() && scriptInjected.compareAndSet(false, true)) {
+            Log.d(TAG_VRF, "Injecting pageScript for URL: $url")
             view.evaluateJavascript(script, null)
+        } else if (!script.isNullOrBlank()) {
+            Log.v(TAG_VRF, "PageScript already injected, skipping for URL: $url")
         }
     }
 
