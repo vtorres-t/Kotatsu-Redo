@@ -116,7 +116,7 @@ class CoverImageView @JvmOverloads constructor(
 	)
 
 	fun setImageAsync(page: MangaPage) = enqueueRequest(
-		newRequestBuilder()
+		newRequestBuilder(applyTrim = true)
 			.data(page)
 			.mangaSourceExtra(page.source)
 			.build(),
