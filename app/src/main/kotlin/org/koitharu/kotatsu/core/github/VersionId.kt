@@ -1,11 +1,11 @@
 package org.koitharu.kotatsu.core.github
 
-import org.koitharu.kotatsu.parsers.util.digits
 import java.util.Locale
 
 data class VersionId(
 	val major: Int,
 	val minor: Int,
+    val patch: Int,
 	val build: Int,
 	val variantType: String,
 	val variantNumber: Int,
@@ -19,7 +19,11 @@ data class VersionId(
 		diff = minor.compareTo(other.minor)
 		if (diff != 0) {
 			return diff
-		}
+        }
+        diff = patch.compareTo(other.patch)
+        if (diff != 0) {
+            return diff
+        }
 		diff = build.compareTo(other.build)
 		if (diff != 0) {
 			return diff
@@ -44,23 +48,15 @@ val VersionId.isStable: Boolean
 	get() = variantType.isEmpty()
 
 fun VersionId(versionName: String): VersionId {
-	if (versionName.startsWith('n', ignoreCase = true)) {
-		// Nightly build
-		return VersionId(
-			major = 0,
-			minor = 0,
-			build = versionName.digits().toIntOrNull() ?: 0,
-			variantType = "n",
-			variantNumber = 0,
-		)
-	}
-	val parts = versionName.substringBeforeLast('-').split('.')
-	val variant = versionName.substringAfterLast('-', "")
-	return VersionId(
-		major = parts.getOrNull(0)?.toIntOrNull() ?: 0,
-		minor = parts.getOrNull(1)?.toIntOrNull() ?: 0,
-		build = parts.getOrNull(2)?.toIntOrNull() ?: 0,
-		variantType = variant.filter(Char::isLetter),
-		variantNumber = variant.filter(Char::isDigit).toIntOrNull() ?: 0,
-	)
+    val version = versionName.removePrefix("v")
+    val parts = version.substringBeforeLast('-').split('.')
+    val variant = version.substringAfterLast('-', "")
+    return VersionId(
+        major = parts.getOrNull(0)?.toIntOrNull() ?: 0,
+        minor = parts.getOrNull(1)?.toIntOrNull() ?: 0,
+        patch = parts.getOrNull(2)?.toIntOrNull() ?: 0,
+        build = parts.getOrNull(3)?.toIntOrNull() ?: 0,
+        variantType = variant.filter(Char::isLetter),
+        variantNumber = variant.filter(Char::isDigit).toIntOrNull() ?: 0,
+    )
 }

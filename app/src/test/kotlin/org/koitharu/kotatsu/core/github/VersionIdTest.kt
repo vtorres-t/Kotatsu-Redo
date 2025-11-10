@@ -12,6 +12,7 @@ class VersionIdTest {
 		val version = VersionId("2.0")
 		assertEquals(version.major, 2)
 		assertEquals(version.minor, 0)
+        assertEquals(version.patch, 0)
 		assertEquals(version.build, 0)
 		assertEquals(version.variantType, "")
 		assertEquals(version.variantNumber, 0)
@@ -22,7 +23,8 @@ class VersionIdTest {
 		val version = VersionId("2.0.1-b1")
 		assertEquals(version.major, 2)
 		assertEquals(version.minor, 0)
-		assertEquals(version.build, 1)
+        assertEquals(version.patch, 1)
+        assertEquals(version.build, 0)
 		assertEquals(version.variantType, "b")
 		assertEquals(version.variantNumber, 1)
 		val version2 = VersionId("2.0.1-beta1")
@@ -35,6 +37,13 @@ class VersionIdTest {
 		val version2 = VersionId("2.0.0")
 		assertTrue(version1 < version2)
 	}
+
+    @Test
+    fun testVersionIdCompareFourDigits() {
+        val version1 = VersionId("1.99.99.99")
+        val version2 = VersionId("2.0.0.0")
+        assertTrue(version1 < version2)
+    }
 	
 	@Test
 	fun testVersionIdVariantCompare() {
@@ -49,4 +58,11 @@ class VersionIdTest {
 		val version2 = VersionId(BuildConfig.VERSION_NAME)
 		assertTrue(version1 < version2)
 	}
+
+    @Test
+    fun testCurrentVersionFourDigits() {
+        val version1 = VersionId("2.4.6.1")
+        val version2 = VersionId(BuildConfig.VERSION_NAME)
+        assertTrue(version1 < version2)
+    }
 }
