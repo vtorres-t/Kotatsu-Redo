@@ -25,7 +25,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val CONTENT_TYPE_APK = "application/vnd.android.package-archive"
-private const val BUILD_TYPE_RELEASE = "release"
 
 @Singleton
 class AppUpdateRepository @Inject constructor(
@@ -53,6 +52,7 @@ class AppUpdateRepository @Inject constructor(
 			.url(releasesUrl)
 		val jsonArray = okHttp.newCall(request.build()).await().parseJsonArray()
         val is64 = android.os.Process.is64Bit()
+
 		android.util.Log.d("UPDATE_DEBUG", "GitHub API returned ${jsonArray.length()} releases")
 
 		return jsonArray.mapJSONNotNull { json ->

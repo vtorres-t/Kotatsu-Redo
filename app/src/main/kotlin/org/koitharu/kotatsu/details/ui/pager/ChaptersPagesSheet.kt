@@ -104,11 +104,12 @@ class ChaptersPagesSheet : BaseAdaptiveSheet<SheetChaptersPagesBinding>(),
         if (newState == STATE_DRAGGING || newState == STATE_SETTLING) {
             return
         }
-		val isActionModeStarted = actionModeDelegate?.isActionModeStarted == true
-		binding.toolbar.menuView?.isVisible = newState == STATE_EXPANDED && !isActionModeStarted
-		binding.splitButtonRead.isVisible = newState != STATE_EXPANDED && !isActionModeStarted
-			&& viewModel is DetailsViewModel
-	}
+        val isActionModeStarted = actionModeDelegate?.isActionModeStarted == true
+
+        binding.toolbar.menuView?.isVisible = newState == STATE_EXPANDED && !isActionModeStarted
+        binding.splitButtonRead.isVisible = newState != STATE_EXPANDED && !isActionModeStarted
+            && viewModel is DetailsViewModel
+    }
 
 	override fun onActionModeStarted(mode: ActionMode) {
 		viewBinding?.toolbar?.menuView?.isVisible = false

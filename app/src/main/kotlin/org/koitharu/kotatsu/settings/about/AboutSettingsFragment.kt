@@ -51,11 +51,6 @@ class AboutSettingsFragment : BasePreferenceFragment(R.string.about) {
 				true
 			}
 
-			AppSettings.KEY_LINK_MANUAL -> {
-				openLink(R.string.url_user_manual, preference.title)
-				true
-			}
-
 			else -> super.onPreferenceTreeClick(preference)
 		}
 	}

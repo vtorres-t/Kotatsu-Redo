@@ -44,12 +44,12 @@ class LocalInfoDialog : AlertDialogFragment<DialogLocalInfoBinding>(), View.OnCl
 		binding.chipCleanup.setOnClickListener(this)
         binding.chipAllcleanup.setOnClickListener(this)
 		combine(viewModel.size, viewModel.availableSize, ::Pair).observe(viewLifecycleOwner) {
-			if (it.first >= 0 && it.second >= 0) {
-				setSegments(it.first, it.second)
-			} else {
-				binding.barView.animateSegments(emptyList())
-			}
-		}
+            if (it.first >= 0 && it.second >= 0) {
+                setSegments(it.first, it.second)
+            } else {
+                binding.barView.animateSegments(emptyList())
+            }
+        }
 		viewModel.onCleanedUp.observeEvent(viewLifecycleOwner, ::onCleanedUp)
         viewModel.onAllCleanedUp.observeEvent(viewLifecycleOwner, ::onAllCleanedUp)
 		viewModel.isCleaningUp.observe(viewLifecycleOwner) { loading ->

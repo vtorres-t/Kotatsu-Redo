@@ -248,11 +248,11 @@ class MangaSourcesRepository @Inject constructor(
     ) { version, skipNsfw, skipBrokenSources ->
 		if (version < BuildConfig.VERSION_CODE) {
             val sources = dao.findAllFromVersion(version)
-                .toSources(skipNsfw, skipBrokenSources,null)
-			sources.isNotEmpty()
-		} else {
-			false
-		}
+                .toSources(skipNsfw, skipBrokenSources, null)
+            sources.isNotEmpty()
+        } else {
+            false
+        }
 	}.onStart { assimilateNewSources() }
 
 	fun clearNewSourcesBadge() {
