@@ -85,7 +85,7 @@ jobs:
                   const { data } = await github.rest.repos.generateReleaseNotes({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    tag_name: 'v${{ env.VERSION }}.${{ github.run_number }}',
+                    tag_name: 'v${{ env.VERSION }}.${{ env.RUN_NUMBER + github.run_number }}',
                     target_commitish: '${{ github.sha }}',
                     previous_tag_name: '${{ steps.previous-release.outputs.tag_name }}',
                   })
@@ -95,8 +95,8 @@ jobs:
               id: create_release
               uses: actions/create-release@v1
               with:
-                release_name: v${{ env.VERSION }}.${{ github.run_number }}
-                tag_name: v${{ env.VERSION }}.${{ github.run_number }}
+                release_name: v${{ env.VERSION }}.${{ env.RUN_NUMBER + github.run_number }}
+                tag_name: v${{ env.VERSION }}.${{ env.RUN_NUMBER + github.run_number }}
                 draft: false
                 prerelease: false
               env:
@@ -110,7 +110,7 @@ jobs:
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
                 asset_path: ${{ steps.releaseApkArm64v8.outputs.apkfileArm64v8 }}
-                asset_name: Kotatsu_arm64v8_v${{ env.VERSION }}.${{ github.run_number }}.apk
+                asset_name: Kotatsu_arm64v8_v${{ env.VERSION }}.${{ env.RUN_NUMBER + github.run_number }}.apk
                 asset_content_type: application/zip
 
             - name: Upload Release APK Armeabiv7a
@@ -121,5 +121,5 @@ jobs:
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
                 asset_path: ${{ steps.releaseApkArmeabiv7a.outputs.apkfileArmeabiv7a }}
-                asset_name: Kotatsu_armeabiv7a_v${{ env.VERSION }}.${{ github.run_number }}.apk
+                asset_name: Kotatsu_armeabiv7a_v${{ env.VERSION }}.${{ env.RUN_NUMBER + github.run_number }}.apk
                 asset_content_type: application/zip
