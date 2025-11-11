@@ -10,7 +10,7 @@ on:
 
 env:
   VERSION: '9.4.6'
-  RUN_NUMBER: ${{ github.run_number }} + 1045
+  RUN_NUMBER: 1045
 
 jobs:
     build:
