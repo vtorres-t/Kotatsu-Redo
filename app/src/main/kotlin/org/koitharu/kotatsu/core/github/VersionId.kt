@@ -26,8 +26,8 @@ data class VersionId(
         }
 		diff = build.compareTo(other.build)
 		if (diff != 0) {
-			return diff
-		}
+            return diff
+        }
 		diff = variantWeight(variantType).compareTo(variantWeight(other.variantType))
 		if (diff != 0) {
 			return diff

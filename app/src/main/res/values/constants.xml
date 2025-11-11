@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="url_github" translatable="false">https://github.com/vtorres-t/Kotatsu-Redo</string>
-	<string name="url_user_manual" translatable="false">https://kotatsu.app/manuals/guides/getting-started/</string>
 	<string name="account_type_sync" translatable="false">org.kotatsu.sync</string>
-	<string name="github_updates_repo" translatable="false">Kotatsu-Redo/Kotatsu-Redo</string>
+	<string name="github_updates_repo" translatable="false">vtorres-t/Kotatsu-Redo</string>
 	<string name="shikimori_clientId" translatable="false">Mw6F0tPEOgyV7F9U9Twg50Q8SndMY7hzIOfXg0AX_XU</string>
 	<string name="shikimori_clientSecret" translatable="false">euBMt1GGRSDpVIFQVPxZrO7Kh6X4gWyv0dABuj4B-M8</string>
 	<string name="anilist_clientId" translatable="false">9887</string>
@@ -13,7 +12,7 @@
 	<string name="kitsu_clientSecret" translatable="false">54d7307928f63414defd96399fc31ba847961ceaecef3a5fd93144e960c0e151</string>
     <string name="sync_authority_favourites">io.github.kotatsuredo.kotatsu.favourites</string>
     <string name="sync_authority_history">io.github.kotatsuredo.kotatsu.history</string>
-	<string name="app_icon_url" translatable="false">https://raw.githubusercontent.com/KotatsuApp/Kotatsu/refs/heads/devel/metadata/en-US/icon.png</string>
+	<string name="app_icon_url" translatable="false">https://raw.githubusercontent.com/vtorres-t/Kotatsu-Redo/refs/heads/devel/icon.png</string>
 	<string-array name="values_theme" translatable="false">
 		<item>-1</item>
 		<item>1</item>

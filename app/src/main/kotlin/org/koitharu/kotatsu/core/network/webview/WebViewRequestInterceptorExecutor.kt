@@ -13,7 +13,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.koitharu.kotatsu.browser.BrowserCallback
-import org.koitharu.kotatsu.core.network.webview.adblock.AdBlock
 import org.koitharu.kotatsu.core.util.ext.configureForParser
 import java.lang.ref.WeakReference
 import javax.inject.Inject
@@ -26,7 +25,6 @@ const val TAG_VRF = "MF_VRF"
 @Singleton
 class WebViewRequestInterceptorExecutor @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val adBlock: AdBlock?,
 ) {
 
     private var webViewCached: WeakReference<WebView>? = null
@@ -87,7 +85,7 @@ class WebViewRequestInterceptorExecutor @Inject constructor(
                 var webView: WebView? = null
                 try {
                     webView = obtainWebView()
-                    val client = RequestInterceptorWebViewClient(callback, adBlock, config, interceptor)
+                    val client = RequestInterceptorWebViewClient(callback, config, interceptor)
                     webView.webViewClient = client
                     webView.loadUrl(url)
 
