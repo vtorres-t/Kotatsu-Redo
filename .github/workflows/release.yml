@@ -49,7 +49,7 @@ jobs:
               with:
                 gradlePath: app/build.gradle
                 versionCode: ${{ github.run_number }}
-                versionName: v${{ env.VERSION }}.${{ github.run_number }}
+                versionName: ${{ env.VERSION }}.${{ github.run_number }}
 
             - name: Build release APK
               run: ./gradlew assembleRelease -PSIGNING_KEY_ALIAS=$SIGNING_KEY_ALIAS -PKEYSTORE_PASSWORD=$KEYSTORE_PASSWORD -PKEYSTORE_FILE=./app/key -PSIGNING_KEY_PASSWORD=$SIGNING_KEY_PASSWORD
