@@ -755,7 +755,6 @@
     <string name="debug">Debug</string>
     <string name="source_code">Source code</string>
     <string name="user_manual">User manual</string>
-    <string name="telegram_group">Discord group</string>
     <string name="error_image_format">Unsupported image format: %s</string>
     <string name="error_not_image">Invalid format: expected image but got %s</string>
     <string name="start_download">Start download</string>
@@ -795,15 +794,7 @@
     <!-- Button label, should be as short as possible -->
     <string name="incognito">Incognito</string>
     <string name="error_connection_reset">Connection reset by remote host</string>
-    <string name="backup_tg_check">Check if API works</string>
-    <string name="backup_tg_echo">Test message</string>
-    <string name="backup_tg_id_not_set">Chat ID is not set</string>
-    <string name="telegram_chat_id">Telegram chat ID</string>
-    <string name="open_telegram_bot">Open the Telegram bot</string>
-    <string name="send_backups_telegram">Send backups in Telegram</string>
     <string name="test_connection">Test connection</string>
-    <string name="telegram_chat_id_summary">Enter the chat ID where backups should be sent</string>
-    <string name="open_telegram_bot_summary">Press to open chat with Kotatsu Backup Bot</string>
     <string name="clear_database">Clear database</string>
     <string name="clear_database_summary">Delete information about manga that is not used</string>
     <string name="enable_all_sources">Enable all manga sources</string>
@@ -893,7 +884,6 @@
     <string name="manga_restricted_description">This manga is not available to read in this source. Try searching for it in other sources or opening it in a browser for more information</string>
     <string name="no_chapters_in_manga">This manga does not contain any chapters</string>
     <string name="chapters_load_failed">Failed to load chapter list</string>
-    <string name="telegram_integration">Telegram integration</string>
     <string name="test_parser">Test manga source</string>
     <string name="rename">Rename</string>
     <string name="save_filter">Save filter</string>
