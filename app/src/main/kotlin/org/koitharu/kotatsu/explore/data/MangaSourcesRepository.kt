@@ -381,8 +381,12 @@ class MangaSourcesRepository @Inject constructor(
 		val result = ArrayList<MangaSourceInfo>(size)
 		for (entity in this) {
 			val source = entity.source.toMangaSourceOrNull() ?: continue
-			if (skipNsfwSources && source.isNsfw()) continue
-            if (skipBrokenSources && source.isBroken) continue
+			if (skipNsfwSources && source.isNsfw()) {
+                continue
+            }
+            if (skipBrokenSources && source.isBroken) {
+                continue
+            }
 
 			if (source in allMangaSources) {
 				result.add(
