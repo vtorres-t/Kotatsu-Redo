@@ -1,0 +1,42 @@
+name: Discord Release Webhook
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  releaseNotification:
+    if: ${{ github.event.release.prerelease == false }}
+    name: Notify Discord - New Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send release embed to Discord
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-title: "🚀 New Release: ${{ github.event.repository.name }} v${{ github.event.release.tag_name }}"
+          embed-url: "${{ github.event.release.html_url }}"
+          embed-description: "${{ github.event.release.body }}"
+          embed-color: 3447003
+          embed-author-name: "${{ github.actor }}"
+          embed-author-icon-url: "https://github.com/${{ github.actor }}.png"
+          embed-footer-text: "Release published on main"
+          embed-timestamp: "${{ github.event.release.published_at }}"
+
+  prereleaseNotification:
+    if: ${{ github.event.release.prerelease == true }}
+    name: Notify Discord - Pre-Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send prerelease embed to Discord
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-title: "🧪 Pre-Release: ${{ github.event.repository.name }} v${{ github.event.release.tag_name }}"
+          embed-url: "${{ github.event.release.html_url }}"
+          embed-description: "${{ github.event.release.body }}"
+          embed-color: 15105570
+          embed-author-name: "${{ github.actor }}"
+          embed-author-icon-url: "https://github.com/${{ github.actor }}.png"
+          embed-footer-text: "Pre-release build"
+          embed-timestamp: "${{ github.event.release.published_at }}"
