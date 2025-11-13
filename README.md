@@ -1,7 +1,7 @@
 <div align="center">
 
 **[Kotatsu-Redo](https://github.com/Kotatsu-Redo/Kotatsu-Redo) is a free and open-source manga reader for Android with built-in
-online content sources. The main goal of the fork is to maitain existing features and sources.**
+online content sources. The main goal of the fork is to maintain existing features and sources.**
 
 ![Android 6.0](https://img.shields.io/badge/android-6.0+-brightgreen) [![Discord](https://img.shields.io/discord/898363402467045416?color=5865f2&label=discord)](https://discord.gg/sfPJSQNxfW) [![License](https://img.shields.io/github/license/KotatsuApp/Kotatsu)](https://github.com/KotatsuApp/Kotatsu/blob/devel/LICENSE)
 
@@ -9,18 +9,18 @@ online content sources. The main goal of the fork is to maitain existing feature
 
 <div align="left">
 
-* Online [manga catalogues](https://github.com/Kotatsu-Redo/kotatsu-parsers-redo) (with 1200+ manga sources)
-* Search manga by name, genres and more filters
-* Favorites organized by user-defined categories
-* Reading history, bookmarks and incognito mode support
-* Download manga and read it offline. Third-party CBZ archives are also supported
-* Clean and convenient Material You UI, optimized for phones, tablets and desktop
-* Standard and Webtoon-optimized customizable reader, gesture support on reading interface
-* Notifications about new chapters with updates feed, manga recommendations (with filters)
-* Integration with manga tracking services: Shikimori, AniList, MyAnimeList, Kitsu
-* Password / fingerprint-protected access to the app
-* Automatically sync app data with other devices on the same account
-* Support for older devices running Android 6.0+
+-   Online [manga catalogues](https://github.com/Kotatsu-Redo/kotatsu-parsers-redo) (with 1200+ manga sources)
+-   Search manga by name, genres and more filters
+-   Favorites organized by user-defined categories
+-   Reading history, bookmarks and incognito mode support
+-   Download manga and read it offline. Third-party CBZ archives are also supported
+-   Clean and convenient Material You UI, optimized for phones, tablets and desktop
+-   Standard and Webtoon-optimized customizable reader, gesture support on reading interface
+-   Notifications about new chapters with updates feed, manga recommendations (with filters)
+-   Integration with manga tracking services: Shikimori, AniList, MyAnimeList, Kitsu
+-   Password / fingerprint-protected access to the app
+-   Automatically sync app data with other devices on the same account
+-   Support for older devices running Android 6.0+
 
 </div>
 
