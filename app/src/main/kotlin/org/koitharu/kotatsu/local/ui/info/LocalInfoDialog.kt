@@ -62,6 +62,15 @@ class LocalInfoDialog : AlertDialogFragment<DialogLocalInfoBinding>(), View.OnCl
 				binding.chipCleanup.setChipIconResource(R.drawable.ic_delete)
 			}
 		}
+        viewModel.isAllCleaningUp.observe(viewLifecycleOwner) { loading ->
+            binding.chipAllcleanup.isClickable = !loading
+            dialog?.setCancelable(!loading)
+            if (loading) {
+                binding.chipAllcleanup.setProgressIcon()
+            } else {
+                binding.chipAllcleanup.setChipIconResource(R.drawable.ic_delete)
+            }
+        }
 	}
 
 	override fun onClick(v: View) {

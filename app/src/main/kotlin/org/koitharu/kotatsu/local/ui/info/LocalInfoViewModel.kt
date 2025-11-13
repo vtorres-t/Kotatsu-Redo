@@ -31,6 +31,7 @@ class LocalInfoViewModel @Inject constructor(
 	private val manga = savedStateHandle.require<ParcelableManga>(AppRouter.KEY_MANGA).manga
 
 	val isCleaningUp = MutableStateFlow(false)
+    val isAllCleaningUp = MutableStateFlow(false)
 	val onCleanedUp = MutableEventFlow<Pair<Int, Long>>()
     val onAllCleanedUp = MutableEventFlow<Boolean>()
 
@@ -60,12 +61,12 @@ class LocalInfoViewModel @Inject constructor(
     fun allCleanup() {
         launchJob(Dispatchers.Default) {
             try {
-                isCleaningUp.value = true
+                isAllCleaningUp.value = true
                 deleteLocalChaptersUseCase.invoke(manga)
                 computeSize().join()
                 onAllCleanedUp.call(true)
             } finally {
-                isCleaningUp.value = false
+                isAllCleaningUp.value = false
             }
         }
     }
