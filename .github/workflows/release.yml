@@ -9,8 +9,8 @@ on:
   workflow_dispatch: # Manual trigger
 
 env:
-  VERSION: '9.4.6'
-  INIT_RUN_NUMBER: 1045
+  VERSION: '9.4.7'
+  INIT_RUN_NUMBER: 1047
 
 jobs:
     build:
