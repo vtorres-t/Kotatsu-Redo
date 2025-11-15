@@ -53,28 +53,127 @@ class WebViewExecutor @Inject constructor(
 		}
 	}
 
-	suspend fun evaluateJs(baseUrl: String?, script: String): String? = mutex.withLock {
-		withContext(Dispatchers.Main.immediate) {
-			val webView = obtainWebView()
-			try {
-				if (!baseUrl.isNullOrEmpty()) {
-					suspendCoroutine { cont ->
-						webView.webViewClient = ContinuationResumeWebViewClient(cont)
-						webView.loadDataWithBaseURL(baseUrl, " ", "text/html", null, null)
-					}
-				}
-				suspendCoroutine { cont ->
-					webView.evaluateJavascript(script) { result ->
-						cont.resume(result?.takeUnless { it == "null" })
-					}
-				}
-			} finally {
-				webView.reset()
-			}
-		}
-	}
+    suspend fun evaluateJs(baseUrl: String?, script: String, timeoutMs: Long = 10000L): String? = mutex.withLock {
+        withContext(Dispatchers.Main.immediate) {
+            val webView = obtainWebView()
+            val handler = android.os.Handler(android.os.Looper.getMainLooper())
 
-	suspend fun tryResolveCaptcha(exception: CloudFlareException, timeout: Long): Boolean = mutex.withLock {
+            try {
+                webView.stopLoading()
+                webView.clearHistory()
+
+                if (!baseUrl.isNullOrEmpty()) {
+                    println("DEBUG: Starting page load for $baseUrl")
+
+                    val result = suspendCoroutine<String?> { cont ->
+                        var hasResumed = false
+                        var isPageFullyLoaded = false
+                        val startTime = System.currentTimeMillis()
+
+                        val contentChecker = object : Runnable {
+                            override fun run() {
+                                if (hasResumed) return
+
+                                if (!isPageFullyLoaded) {
+                                    println("DEBUG: Waiting for page to finish loading...")
+                                    handler.postDelayed(this, 300)
+                                    return
+                                }
+
+                                println("DEBUG: Checking script result...")
+
+                                webView.evaluateJavascript(script) { result ->
+                                    if (hasResumed) return@evaluateJavascript
+
+                                    println("DEBUG: Raw result length: ${result?.length ?: 0}")
+
+                                    // Check if script explicitly returned null (waiting for content)
+                                    val isWaitingForContent = result == null || result == "null"
+
+                                    if (isWaitingForContent) {
+                                        println("DEBUG: Script returned null, content not ready yet")
+
+                                        if (System.currentTimeMillis() - startTime >= timeoutMs) {
+                                            println("DEBUG: Timeout reached")
+                                            hasResumed = true
+                                            handler.removeCallbacksAndMessages(null)
+                                            cont.resume(null)
+                                        } else {
+                                            // Keep checking every 300ms
+                                            handler.postDelayed(this, 300)
+                                        }
+                                    } else {
+                                        // Script returned actual content - return it immediately
+                                        println("DEBUG: Script detected valid content, returning immediately")
+                                        hasResumed = true
+                                        handler.removeCallbacksAndMessages(null)
+                                        cont.resume(result.takeUnless { it == "null" })
+                                    }
+                                }
+                            }
+                        }
+
+                        webView.webViewClient = object : WebViewClient() {
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                super.onPageFinished(view, url)
+
+                                if (url == "about:blank") {
+                                    println("DEBUG: Ignoring about:blank")
+                                    return
+                                }
+
+                                println("DEBUG: onPageFinished for $url")
+                                isPageFullyLoaded = true
+
+                                handler.removeCallbacks(contentChecker)
+                                handler.postDelayed(contentChecker, 500)
+                            }
+
+                            override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                                super.onPageStarted(view, url, favicon)
+
+                                if (url == "about:blank") {
+                                    return
+                                }
+
+                                println("DEBUG: onPageStarted for $url")
+                                isPageFullyLoaded = false
+                            }
+                        }
+
+                        val timeoutCallback = Runnable {
+                            if (!hasResumed) {
+                                println("ERROR: Overall timeout reached")
+                                hasResumed = true
+                                handler.removeCallbacksAndMessages(null)
+                                cont.resume(null)
+                            }
+                        }
+                        handler.postDelayed(timeoutCallback, timeoutMs)
+
+                        println("DEBUG: Loading URL: $baseUrl")
+                        webView.loadUrl(baseUrl)
+                    }
+
+                    println("DEBUG: Returning result with length: ${result?.length ?: 0}")
+                    return@withContext result
+                }
+
+                // If no baseUrl, just evaluate script directly
+                println("DEBUG: Evaluating script without loading URL")
+                suspendCoroutine { cont ->
+                    webView.evaluateJavascript(script) { result ->
+                        cont.resume(result?.takeUnless { it == "null" })
+                    }
+                }
+            } finally {
+                handler.removeCallbacksAndMessages(null)
+                webView.reset()
+            }
+        }
+    }
+
+    suspend fun tryResolveCaptcha(exception: CloudFlareException, timeout: Long): Boolean = mutex.withLock {
 		runCatchingCancellable {
 			withContext(Dispatchers.Main.immediate) {
 				val webView = obtainWebView()
