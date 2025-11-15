@@ -7,7 +7,6 @@ import androidx.core.os.LocaleListCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -33,11 +32,9 @@ import org.koitharu.kotatsu.parsers.webview.InterceptionConfig as ParsersInterce
 import org.koitharu.kotatsu.parsers.network.UserAgents
 import org.koitharu.kotatsu.parsers.util.map
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.io.use
 
 @Singleton
 class MangaLoaderContextImpl @Inject constructor(
@@ -49,15 +46,13 @@ class MangaLoaderContextImpl @Inject constructor(
 ) : MangaLoaderContext() {
 
     private val webViewUserAgent by lazy { obtainWebViewUserAgent() }
-    private val jsTimeout = TimeUnit.SECONDS.toMillis(4)
 
     @Deprecated("Provide a base url")
     @SuppressLint("SetJavaScriptEnabled")
-    override suspend fun evaluateJs(script: String): String? = evaluateJs("", script)
+    override suspend fun evaluateJs(script: String): String? = evaluateJs("", script, timeout = 10000L)
 
-    override suspend fun evaluateJs(baseUrl: String, script: String): String? = withTimeout(jsTimeout) {
-        webViewExecutor.evaluateJs(baseUrl, script)
-    }
+    override suspend fun evaluateJs(baseUrl: String, script: String, timeout: Long): String? =
+        webViewExecutor.evaluateJs(baseUrl, script, timeoutMs = timeout)
 
     override fun getDefaultUserAgent(): String = webViewUserAgent
 
